@@ -477,7 +477,7 @@
                 font-weight: 700;
                 font-family: 'Inter', monospace;
                 letter-spacing: 2px;
-                color: var(--lava-red);
+                color: var (--lava-red);
                 text-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
                 margin: 2rem 0;
             }
@@ -590,7 +590,7 @@
             .note-content {
                 min-height: 100px;
                 padding: 10px;
-                background-color: var(--darker-bg);
+                background-color: var (--darker-bg);
                 border-radius: var(--border-radius-sm);
                 margin: 10px 0;
                 white-space: pre-wrap;
@@ -1180,16 +1180,20 @@ const fullscreenTimer = document.getElementById('fullscreenTimer');
 const timerTaskName = document.getElementById('timerTaskName');
 const timerCountdown = document.getElementById('timerCountdown');
 const exitFullscreen = document.getElementById('exitFullscreen');
+const pauseResumeTimer = document.getElementById('pauseResumeTimer');
+const takeBreak = document.getElementById('takeBreak');
+const cancelBreak = document.getElementById('cancelBreak');
 
 let countdownInterval;
 let isPaused = false;
-let remainingTime = 0;
+let totalTimeInSeconds = 0;
 let isOnBreak = false;
 let taskName = '';
 let timerStartTime;
+let pausedDuration = 0;
+let pauseStartTime;
 let breakStartTime;
 let breakTime = 0;
-
 
 // Populate task dropdown
 function populateTaskSelect() {
@@ -1238,34 +1242,26 @@ document.addEventListener('DOMContentLoaded', () => {
 // Modify startCountdown function
 // Inside startCountdown function, store the start time
 function startCountdown(minutes, task) {
-    remainingTime = minutes * 60;
+    totalTimeInSeconds = minutes * 60;
     taskName = task;
-    timerStartTime = new Date();
+    timerStartTime = new Date().getTime();
+    pausedDuration = 0;
+    isPaused = false;
     isOnBreak = false;
 
     timerTaskName.textContent = `Task: ${taskName}`;
     fullscreenTimer.style.display = 'flex';
 
-    updateCountdownDisplay(remainingTime);
+    updateCountdownDisplay(totalTimeInSeconds);
 
-    const endTime = Date.now() + remainingTime * 1000;
-    countdownInterval = setInterval(() => {
-        const now = Date.now();
-        remainingTime = Math.round((endTime - now) / 1000);
-        updateCountdownDisplay(remainingTime);
-
-        if (remainingTime <= 0) {
-            clearInterval(countdownInterval);
-            recordTime(taskName, (new Date() - timerStartTime) / 1000, 'task');
-            alert("Time's up!");
-            fullscreenTimer.style.display = 'none';
-        }
-    }, 1000);
+    countdownInterval = setInterval(mainTimerFunction, 1000);
 }
 
 function mainTimerFunction() {
     if (!isPaused) {
-        remainingTime--;
+        let currentTime = new Date().getTime();
+        let elapsedTime = Math.floor((currentTime - timerStartTime - pausedDuration) / 1000);
+        let remainingTime = totalTimeInSeconds - elapsedTime;
         updateCountdownDisplay(remainingTime);
 
         if (remainingTime <= 0) {
@@ -1285,13 +1281,19 @@ function updateCountdownDisplay(seconds) {
 }
 
 // Event listener for Pause/Resume button
-const pauseResumeTimer = document.getElementById('pauseResumeTimer');
 pauseResumeTimer.addEventListener('click', () => {
-    isPaused = !isPaused;
-    pauseResumeTimer.textContent = isPaused ? 'Resume' : 'Pause';
+    if (isPaused) {
+        isPaused = false;
+        pausedDuration += new Date().getTime() - pauseStartTime;
+        pauseResumeTimer.textContent = 'Pause';
+    } else {
+        isPaused = true;
+        pauseStartTime = new Date().getTime();
+        pauseResumeTimer.textContent = 'Resume';
+    }
 });
 
-const takeBreak = document.getElementById('takeBreak');
+
 // Modify takeBreak event listener
 takeBreak.addEventListener('click', () => {
     if (isOnBreak) return;
@@ -1323,7 +1325,7 @@ function endBreak() {
 
     cancelBreak.style.display = 'none';
 
-    updateCountdownDisplay(remainingTime);
+    updateCountdownDisplay(totalTimeInSeconds);
     countdownInterval = setInterval(mainTimerFunction, 1000);
 }
 // When user exits the fullscreen timer
@@ -1345,7 +1347,6 @@ $(document).ready(function(){
         });
 
 // Get the cancel break button element
-const cancelBreak = document.getElementById('cancelBreak');
 
 cancelBreak.addEventListener('click', () => {
     if (!isOnBreak) return;
@@ -1360,7 +1361,7 @@ cancelBreak.addEventListener('click', () => {
 
     cancelBreak.style.display = 'none';
 
-    updateCountdownDisplay(remainingTime);
+    updateCountdownDisplay(totalTimeInSeconds);
     countdownInterval = setInterval(mainTimerFunction, 1000);
 });
 
@@ -1403,7 +1404,7 @@ function startBreakCountdown(minutes) {
             // Hide Cancel Break button
             cancelBreak.style.display = 'none';
 
-            updateCountdownDisplay(remainingTime);
+            updateCountdownDisplay(totalTimeInSeconds);
             countdownInterval = setInterval(mainTimerFunction, 1000);
         }
     }, 1000);
