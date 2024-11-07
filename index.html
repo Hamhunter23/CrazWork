@@ -83,7 +83,7 @@
                 left: 0;
                 width: 0;
                 height: 2px;
-                background-color: var(--lava-red);
+                background-color: var (--lava-red);
                 transition: width 0.3s;
             }
 
@@ -206,7 +206,7 @@
         background: rgba(255, 255, 255, 0.1); /* Light transparent background */
         padding: 12px;
         margin-bottom: 10px;
-        border-radius: var(--border-radius-md);
+        border-radius: 15px; /* Increase this value as desired */
         transition: opacity 0.3s;
         backdrop-filter: blur(10px); /* Blur effect */
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
@@ -397,7 +397,7 @@
     
             .delete-event {
                 background-color: transparent;
-                color: var(--lava-red);
+                color: var (--lava-red);
                 padding: 4px 8px;
                 float: right;
                 border-radius: var(--border-radius-sm);
@@ -467,7 +467,7 @@
             #timerTaskName {
                 font-size: 1.5rem;
                 font-weight: 500;
-                color: var(--light-gray);
+                color: var (--light-gray);
                 margin-bottom: 1rem;
                 letter-spacing: 0.5px;
             }
@@ -520,7 +520,7 @@
                 padding: 12px 40px 12px 15px; /* Extra padding for arrow */
                 background-color: var(--gray);
                 border: 2px solid transparent;
-                border-radius: var(--border-radius-md);
+                border-radius: var (--border-radius-md);
                 color: white;
                 font-family: inherit;
                 font-size: 1rem;
@@ -738,6 +738,142 @@
         max-width: 100%;
     }
 }
+/* Update the task-item class to use flex layout */
+.task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* ...existing styles... */
+}
+
+/* Style for the task-content class */
+.task-content {
+    display: flex;
+    align-items: center;
+}
+
+/* Style the Discard button */
+.discard-btn {
+    background-color: var(--gray);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 30px;
+    text-align: center;
+    padding: 0;
+    transition: background-color 0.3s;
+}
+
+.discard-btn:hover {
+    background-color: var(--lava-red);
+}
+
+/* Optional: Adjust the task-checkbox for better alignment */
+.task-checkbox {
+    margin-right: 10px;
+    /* ...existing styles... */
+}
+/* Update the modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(10, 10, 10, 0.9); /* Dark semi-transparent background */
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--darker-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    width: 80%;
+    max-width: 500px;
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.close-modal {
+    background-color: var(--gray);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+.close-modal:hover {
+    background-color: var(--lava-red);
+}
+
+/* Style the discarded task list */
+#discardedTaskList {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#discardedTaskList li {
+    background-color: var(--dark-bg);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#discardedTaskList li span {
+    flex: 1;
+}
+
+#discardedTaskList li button {
+    background-color: var(--gray);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-left: 10px;
+}
+
+#discardedTaskList li button:hover {
+    background-color: var(--lava-red);
+}
+
+/* Adjust scrollbar for the discarded task list */
+#discardedTaskList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#discardedTaskList::-webkit-scrollbar-thumb {
+    background-color: var(--gray);
+    border-radius: var(--border-radius-md);
+}
+/* Add styles for completed tasks */
+.task-item.completed {
+    color: grey;
+    text-decoration: line-through;
+}
         </style>
     </head>
     <body>
@@ -770,6 +906,7 @@
                 <input type="text" class="task-input" id="taskInput" placeholder="Add a new task...">
                 <ul class="task-list" id="taskList"></ul>
                 <button id="openTimerSetup">Set Timer</button>
+                <button id="trashButton">Trash</button>
             </div>
 
             <div class="content-section" id="goalsContent">
@@ -846,6 +983,15 @@
             <button id="exitFullscreen">Exit Fullscreen</button>
         </div>
 
+        <div id="trashModal" class="modal">
+            <div class="modal-content">
+                <h2>Discarded Tasks</h2>
+                <ul id="discardedTaskList">
+                    <!-- Discarded tasks will be rendered here -->
+                </ul>
+                <button id="closeTrash" class="close-modal">Close</button>
+            </div>
+        </div>
 
     <script>
                 // Add these variables at the top of your script
@@ -1024,36 +1170,135 @@
         const taskInput = document.getElementById('taskInput');
         const taskList = document.getElementById('taskList');
         let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let discardedTasks = JSON.parse(localStorage.getItem('discardedTasks')) || [];
 
         function saveTasks() {
             localStorage.setItem('tasks', JSON.stringify(tasks));
         }
 
-        function renderTasks() {
-            taskList.innerHTML = '';
-            tasks.forEach((task, index) => {
-                const li = document.createElement('li');
-                li.className = `task-item ${task.completed ? 'completed' : ''}`;
-                li.innerHTML = `
-                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''}>
-                    <span>${task.text}</span>
-                `;
-                
-                const checkbox = li.querySelector('.task-checkbox');
-                checkbox.addEventListener('change', () => {
-    tasks[index].completed = checkbox.checked;
-    if (checkbox.checked) {
-        tasks[index].completedAt = new Date().toISOString();
-    } else {
-        delete tasks[index].completedAt;
-    }
-    li.classList.toggle('completed');
-    saveTasks();
-});
-
-                taskList.appendChild(li);
-            });
+        function saveDiscardedTasks() {
+            localStorage.setItem('discardedTasks', JSON.stringify(discardedTasks));
         }
+
+        function renderTasks() {
+    taskList.innerHTML = '';
+    tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.className = 'task-item';
+
+        // Add 'completed' class if the task is completed
+        if (task.completed) {
+            li.classList.add('completed');
+        }
+
+        // Create a container for the checkbox and label
+        const taskContent = document.createElement('div');
+        taskContent.className = 'task-content';
+
+        // Create the checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.className = 'task-checkbox';
+        checkbox.addEventListener('change', () => {
+            task.completed = checkbox.checked;
+            saveTasks();
+            renderTasks();
+        });
+
+        // Create the label
+        const label = document.createElement('span');
+        label.textContent = task.text;
+
+        taskContent.appendChild(checkbox);
+        taskContent.appendChild(label);
+
+        // Create the Discard button
+        const discardBtn = document.createElement('button');
+        discardBtn.textContent = '✕'; // Use an "X" symbol or any icon
+        discardBtn.className = 'discard-btn';
+        discardBtn.addEventListener('click', () => discardTask(index));
+
+        // Append the content and discard button to the list item
+        li.appendChild(taskContent);
+        li.appendChild(discardBtn);
+
+        taskList.appendChild(li);
+    });
+}
+
+        function discardTask(index) {
+            const discardedTask = tasks.splice(index, 1)[0];
+            discardedTask.discardedAt = Date.now();
+            discardedTasks.push(discardedTask);
+            saveTasks();
+            saveDiscardedTasks();
+            renderTasks();
+        }
+
+        function renderDiscardedTasks() {
+    const discardedTaskList = document.getElementById('discardedTaskList');
+    discardedTaskList.innerHTML = '';
+    discardedTasks.forEach((task, index) => {
+        const li = document.createElement('li');
+
+        const taskText = document.createElement('span');
+        taskText.textContent = task.text;
+
+        // Restore button
+        const restoreBtn = document.createElement('button');
+        restoreBtn.textContent = 'Restore';
+        restoreBtn.addEventListener('click', () => restoreTask(index));
+
+        // Optionally, add a permanent delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', () => deleteDiscardedTask(index));
+
+        li.appendChild(taskText);
+        li.appendChild(restoreBtn);
+        li.appendChild(deleteBtn);
+
+        discardedTaskList.appendChild(li);
+    });
+}
+
+/* Function to delete a discarded task permanently */
+function deleteDiscardedTask(index) {
+    discardedTasks.splice(index, 1);
+    saveDiscardedTasks();
+    renderDiscardedTasks();
+}
+
+        function restoreTask(index) {
+            const restoredTask = discardedTasks.splice(index, 1)[0];
+            delete restoredTask.discardedAt;
+            tasks.push(restoredTask);
+            saveTasks();
+            saveDiscardedTasks();
+            renderTasks();
+            renderDiscardedTasks();
+        }
+
+        // Load discarded tasks from localStorage
+        if (localStorage.getItem('discardedTasks')) {
+            discardedTasks = JSON.parse(localStorage.getItem('discardedTasks'));
+            // Remove tasks older than a week
+            const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+            discardedTasks = discardedTasks.filter(task => task.discardedAt > oneWeekAgo);
+            saveDiscardedTasks();
+        }
+
+        // Add event listener for the Trash button
+        document.getElementById('trashButton').addEventListener('click', () => {
+            renderDiscardedTasks();
+            document.getElementById('trashModal').style.display = 'block';
+        });
+
+        // Close the Trash modal
+        document.getElementById('closeTrash').addEventListener('click', () => {
+            document.getElementById('trashModal').style.display = 'none';
+        });
 
         taskInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && taskInput.value.trim()) {
@@ -1352,7 +1597,7 @@ cancelBreak.addEventListener('click', () => {
     if (!isOnBreak) return;
 
     clearInterval(countdownInterval);
-    recordTime('Break', (new Date() - breakStartTime) / 1000, 'break');
+    recordTime('Break', (new Date() - breakStartTime) / 1000);
 
     timerTaskName.textContent = `Task: ${taskName}`;
     isPaused = false;
